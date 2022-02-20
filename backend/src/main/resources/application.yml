@@ -1,2 +1,18 @@
 server:
   port: 8888
+
+
+spring:
+  jpa:
+    show-sql: true
+
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
