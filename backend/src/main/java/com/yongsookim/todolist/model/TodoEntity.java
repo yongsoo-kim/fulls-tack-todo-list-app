@@ -12,10 +12,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
+@DynamicUpdate
 @Data
 @Builder
 @NoArgsConstructor
@@ -30,6 +32,7 @@ public class TodoEntity {
     private UUID id;
     private String userId;
     private String title;
+    private boolean checked;
     private String contents;
 
     @CreationTimestamp
