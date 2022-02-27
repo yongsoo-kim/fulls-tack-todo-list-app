@@ -2,10 +2,11 @@ package com.yongsookim.todolist.service;
 
 import com.yongsookim.todolist.model.TodoEntity;
 import com.yongsookim.todolist.persistence.TodoRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +21,12 @@ public class TodoService {
     private final ModelMapper modelMapper;
 
 
+    public Page<TodoEntity> getTodos(String titleLike, PageRequest pageRequest) {
 
-    public List<TodoEntity> getTodos() {
-        return todoRepository.findAll();
-
+        if (titleLike.isEmpty()) {
+            return todoRepository.findAll(pageRequest);
+        }
+        return todoRepository.findAllByTitleContaining(titleLike, pageRequest);
     }
 
     public TodoEntity createNewTodo(final TodoEntity entity) {

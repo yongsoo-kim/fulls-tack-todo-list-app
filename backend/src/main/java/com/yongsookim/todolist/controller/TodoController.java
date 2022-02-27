@@ -1,19 +1,26 @@
 package com.yongsookim.todolist.controller;
 
+import com.yongsookim.todolist.config.PaginationProperties;
 import com.yongsookim.todolist.dto.ResponseDTO;
 import com.yongsookim.todolist.dto.TodoDTO;
 import com.yongsookim.todolist.model.TodoEntity;
 import com.yongsookim.todolist.service.TodoService;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,6 +32,8 @@ public class TodoController {
 
     private final TodoService todoService;
 
+    private final PaginationProperties paginationProperties;
+
 
     @GetMapping("/hello")
     public ResponseEntity<?> hello() {
@@ -34,10 +43,25 @@ public class TodoController {
 
 
     @GetMapping(RESOURCE_PATH_TODO)
-    public ResponseEntity<?> retrieveTodos() {
-        List<TodoEntity> todoEntities = todoService.getTodos();
+    public ResponseEntity<?> retrieveTodos(
+        @RequestParam("title_like") Optional<String> titleLike,
+        @RequestParam("page") Optional<Integer> page,
+        @RequestParam("size") Optional<Integer> size) {
 
-        List<TodoDTO> todoDTOS = todoEntities.stream()
+        //TODO: 객체화 시키는것도 괜찮을듯?
+        PageRequest pageRequest = PageRequest.of(
+            page.orElse(paginationProperties.getDefaultPage()),
+            size.orElse(paginationProperties.getDefaultSize()),
+            Direction.DESC,
+            "updatedDate"
+        );
+
+        Page<TodoEntity> todoPage = todoService.getTodos(titleLike.orElse(""), pageRequest);
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("X-Total-Count", String.valueOf(todoPage.getTotalElements()));
+
+        List<TodoDTO> todoDTOS = todoPage.getContent().stream()
             .map(TodoDTO::new)
             .collect(Collectors.toList());
 
@@ -45,7 +69,7 @@ public class TodoController {
             .data(todoDTOS)
             .build();
 
-        return ResponseEntity.ok().body(responseDTO);
+        return ResponseEntity.ok().headers(responseHeaders).body(responseDTO);
     }
 
 

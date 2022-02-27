@@ -108,6 +108,7 @@ class TodoControllerTest {
 
         MockHttpServletResponse response = mockMvc.perform(get("/todo"))
             .andExpect(status().isOk())
+            .andExpect(header().exists("X-Total-Count"))
             .andReturn()
             .getResponse();
 
