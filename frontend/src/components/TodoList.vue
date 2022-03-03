@@ -5,11 +5,15 @@
     </div>
     <ul class="list-group input-group">
       <li class="list-group-item" v-for="(item, index) in todos" :key="item.id">
-        <input type="checkbox" @change="toggleCheck(index)" />
+        <input
+          type="checkbox"
+          @change="$emit('toggle-check', index)"
+          :checked="item.checked"
+        />
         <span :class="item.checked ? 'done-todo' : ''">
           {{ item.title }}
         </span>
-        <button class="btn btn-danger" @click="deleteTodo(index)">
+        <button class="btn btn-danger" @click="$emit('delete-todo', item.id)">
           DELETE
         </button>
       </li>
@@ -26,22 +30,6 @@ export default {
       type: Array,
       required: true,
     },
-  },
-  setup(props, context) {
-
-    const toggleCheck = (index) => {
-        context.emit("toggle-check", index);
-    };
-
-    
-    const deleteTodo = (index) => {
-      context.emit("delete-todo", index);
-    };
-
-    return {
-      toggleCheck,
-      deleteTodo
-    };
   },
 };
 </script>

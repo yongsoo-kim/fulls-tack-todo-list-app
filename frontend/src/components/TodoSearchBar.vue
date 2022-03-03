@@ -5,27 +5,22 @@
       type="text"
       class="form-control"
       placeholder="Search"
-      v-model="searchKeyInputs"
+      @keyup="searchTodo"
     />
   </div>
 </template>
 
 <script>
-import { ref, watchEffect } from "vue";
-
 export default {
   emits: ["searchKeyInputs"],
   setup(props, { emit }) {
-    const searchKeyInputs = ref("");
-
-    watchEffect(() => {
-      if (searchKeyInputs.value != "") {
-        emit("searchKeyInputs", searchKeyInputs.value);
-      }
-    });
+    const searchTodo = (e) => {
+      const searchKeyInputs = e.target.value;
+      emit("search-key-input", searchKeyInputs);
+    };
 
     return {
-      searchKeyInputs,
+      searchTodo,
     };
   },
 };

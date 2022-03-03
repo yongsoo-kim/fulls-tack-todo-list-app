@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -90,8 +91,12 @@ public class TodoController {
     }
 
 
-    @PutMapping(RESOURCE_PATH_TODO)
-    public ResponseEntity<?> updateTodo(@RequestBody TodoDTO todoDTO) {
+    @PutMapping(RESOURCE_PATH_TODO + "/{id}")
+    public ResponseEntity<?> updateTodo(
+        @PathVariable("id") String UUID,
+        @RequestBody TodoDTO todoDTO) {
+
+        todoDTO.setId(UUID);
 
         TodoEntity inputEntity = TodoDTO.convertToEntity(todoDTO);
         inputEntity.setUserId("testUser");
@@ -102,9 +107,12 @@ public class TodoController {
     }
 
 
-    @DeleteMapping(RESOURCE_PATH_TODO)
-    public ResponseEntity<?> deleteTodo(@RequestBody TodoDTO todoDTO) {
-        TodoEntity entity = TodoDTO.convertToEntity(todoDTO);
+    //TODO: DELETE에서 payload쓰는것은 그만두자. 03/01 Clear!
+    //TODO: stringUUID의 Null체크는 어떻게 해야할까? Null이면 삭제행?
+    @DeleteMapping(RESOURCE_PATH_TODO + "/{id}")
+    public ResponseEntity<?> deleteTodo(@PathVariable("id") String stringUUID) {
+
+        TodoEntity entity = TodoDTO.convertToEntity(stringUUID);
 
         todoService.deleteTodo(entity);
 

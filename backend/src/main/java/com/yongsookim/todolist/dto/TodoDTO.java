@@ -38,4 +38,16 @@ public class TodoDTO {
         return entity;
     }
 
+    public static TodoEntity convertToEntity(final String stringUUID) {
+
+        //TODO: 지저분하다. 개선하자.
+        final UUID id = UUID.fromString(stringUUID);
+
+        TodoEntity entity = TodoEntity.builder()
+            .id(id)
+            .build();
+
+        return entity;
+    }
+
 }
