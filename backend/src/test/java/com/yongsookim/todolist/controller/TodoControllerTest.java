@@ -146,12 +146,11 @@ class TodoControllerTest {
         final String updateContents = "update contents";
 
         JSONObject testRequestJson = new JSONObject();
-        testRequestJson.put("id", newTodoId.toString());
         testRequestJson.put("checked", updateChecked);
         testRequestJson.put("title", updateTitle);
         testRequestJson.put("contents", updateContents);
 
-        mockMvc.perform(put("/todo")
+        MockHttpServletResponse response = mockMvc.perform(put("/todo/" + newTodoId.toString())
             .contentType(MediaType.APPLICATION_JSON)
             .content(testRequestJson.toString()))
             .andExpect(status().isOk())
@@ -188,12 +187,8 @@ class TodoControllerTest {
         final TodoEntity newEntity = todoRepository.save(newItem);
         final UUID newTodoId = newEntity.getId();
 
-        JSONObject testRequestJson = new JSONObject();
-        testRequestJson.put("id", newTodoId.toString());
-
-        MockHttpServletResponse response = mockMvc.perform(delete("/todo")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(testRequestJson.toString()))
+        MockHttpServletResponse response = mockMvc.perform(delete("/todo/" + newTodoId.toString())
+            .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent())
             .andReturn()
             .getResponse();

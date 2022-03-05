@@ -6,13 +6,14 @@
       class="form-control"
       placeholder="Search"
       @keyup="searchTodo"
+      @keyup.enter="$emit('instant-searchTodo')"
     />
   </div>
 </template>
 
 <script>
 export default {
-  emits: ["searchKeyInputs"],
+  emits: ["search-key-input", "instant-searchTodo"],
   setup(props, { emit }) {
     const searchTodo = (e) => {
       const searchKeyInputs = e.target.value;

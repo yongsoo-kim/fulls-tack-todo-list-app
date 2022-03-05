@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- Todo search bar part -->
-    <TodoSearchBar @search-key-input="onSearchKeyInputs" />
+    <TodoSearchBar @search-key-input="searchTodo" @instant-searchTodo="instantSearchTodo" />
 
     <hr />
 
@@ -77,12 +77,13 @@ export default {
 
   setup() {
     const todos = ref([]);
-    const searchKeyInputs = ref("");
     const alertMessage = ref("");
 
     const totalTodoCount = ref(0);
     const currentPage = ref(1);
     const defaultPageSize = 5;
+
+    let searchKeyInputs = "";
 
     const totalPageCount = computed(() => {
       return Math.ceil(totalTodoCount.value / 5);
@@ -98,7 +99,7 @@ export default {
 
       try {
         const res = await axios.get(
-          `http://localhost:8888/todo?page=${pageNo}&size=${defaultPageSize}&title_like=${searchKeyInputs.value}`
+          `http://localhost:8888/todo?page=${pageNo}&size=${defaultPageSize}&title_like=${searchKeyInputs}`
         );
         todos.value = res.data.data;
         // Get total Todo counts
@@ -144,10 +145,27 @@ export default {
       }
     };
 
-    const onSearchKeyInputs = (keyInputs) => {
-      searchKeyInputs.value = keyInputs;
-      getTodos();
+    //setTimeout은 시간을 지연시켜줄뿐, 중복된 call을 막아주지는 못한다.
+    //중복 call취소기능을 넣어야한다.
+    //setTimeout의 취소는 clearTimeout으로 가능하다.
+    //그리고 엔터를 넣게되면 바로 검색되게 해보자.
+
+    let timeout = null;
+
+    const searchTodo = (keyInputs) => {
+      searchKeyInputs = keyInputs;
+
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        getTodos();
+      }, 1000);
     };
+
+    const instantSearchTodo= () => {
+      clearTimeout(timeout);
+      getTodos();
+    }
+
 
     const toggleCheck = async (index) => {
       alertMessage.value = "";
@@ -176,13 +194,13 @@ export default {
       addNewTodo,
       toggleCheck,
       deleteTodo,
-      searchKeyInputs,
-      onSearchKeyInputs,
+      searchTodo,
       alertMessage,
       totalTodoCount,
       totalPageCount,
       currentPage,
       movePage,
+      instantSearchTodo
     };
   },
 };
